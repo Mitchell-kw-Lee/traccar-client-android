@@ -13,7 +13,7 @@ It can be worked with any of your HTTP/HTTP based own WAS or Web Server(All data
 
 
 ## Download Link
-https://github.com/Mitchell-kw-Lee/traccar-client-android/blob/master/app-regular-release.apk
+https://github.com/Mitchell-kw-Lee/traccar-client-android/raw/master/app-regular-release.apk
 
 
 ## License
