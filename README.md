@@ -1,12 +1,15 @@
 
 ## Overview
 
-Traccar Client is an Android GPS tracking application which forked from lazy original(Based on 5.16).
+Free open source GPS Tracking application.
 
-It can work with your own WAS or Web Server(All data being sent as GET method).
+This Traccar Client is an Android GPS tracking application which forked from lazy original(Based on 5.16).
+
+It can be worked with any of your HTTP/HTTP based own WAS or Web Server(All data being sent as GET method).
 
 - Supported HTTP Basic Auth
 - Force update interval
+- Only support English
 
 
 ## License
