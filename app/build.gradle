@@ -5,7 +5,7 @@ android {
     buildToolsVersion '28.0.3'
 
     defaultConfig {
-        applicationId "com.mobileneuron.gps.tracking"
+        applicationId "app.traccar2.gps.tracking"
         buildConfigField "boolean", "HIDDEN_APP", "false"
         minSdkVersion 15
         targetSdkVersion 28
@@ -22,7 +22,7 @@ android {
         regular
         google
         hidden {
-            applicationId "com.mobileneuron.gps.tracking.hidden"
+            applicationId "app.traccar2.gps.tracking.hidden"
             buildConfigField "boolean", "HIDDEN_APP", "true"
         }
     }
