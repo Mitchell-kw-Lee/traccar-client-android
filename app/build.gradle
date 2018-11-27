@@ -5,12 +5,12 @@ android {
     buildToolsVersion '28.0.3'
 
     defaultConfig {
-        applicationId "org.traccar.client"
+        applicationId "com.mobileneuron.gps.tracking"
         buildConfigField "boolean", "HIDDEN_APP", "false"
         minSdkVersion 15
         targetSdkVersion 28
-        versionCode 54
-        versionName '5.16'
+        versionCode 20181127
+        versionName '20181127'
     }
 
     lintOptions {
@@ -22,7 +22,7 @@ android {
         regular
         google
         hidden {
-            applicationId "org.traccar.client.hidden"
+            applicationId "com.mobileneuron.gps.tracking.hidden"
             buildConfigField "boolean", "HIDDEN_APP", "true"
         }
     }
@@ -39,7 +39,7 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     testImplementation 'org.robolectric:robolectric:3.8'
     googleImplementation 'com.google.firebase:firebase-core:16.0.5'
-    googleImplementation 'com.crashlytics.sdk.android:crashlytics:2.9.5'
+    googleImplementation 'com.crashlytics.sdk.android:crashlytics:2.9.6'
 }
 
 if (getGradle().getStartParameter().getTaskRequests().toString().contains("Google")) {
