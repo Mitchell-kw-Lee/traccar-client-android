@@ -12,6 +12,10 @@ It can be worked with any of your HTTP/HTTP based own WAS or Web Server(All data
 - Only support English
 
 
+## Download Link
+https://github.com/Mitchell-kw-Lee/traccar-client-android/blob/master/app-regular-release.apk
+
+
 ## License
 
     Apache License, Version 2.0
