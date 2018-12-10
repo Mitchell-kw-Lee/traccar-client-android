@@ -45,9 +45,25 @@
   <string name="status_send_fail">Send failed</string>
   <string name="status_location_update">Location update</string>
   <string name="status_location_ignored">Location ignored</string>
+  <string name="status_movement_not_detected">Movement NOT detect</string>
   <string name="status_network_online">Network online</string>
   <string name="status_network_offline">Network offline</string>
+
+  <string name="status_activity_moving">Activity:Moving:</string>
+  <string name="status_activity_staying">Activity:Staying:</string>
+
   <string name="hidden_app_name">Device Settings</string>
   <string name="hidden_alert">The app has been hidden. To open it again please dial 8722227 (TRACCAR).</string>
   <string name="error_msg_invalid_url">Please enter a valid http:// or https:// URL</string>
+
+  <!--<string name="in_vehicle">In a vehicle</string>-->
+  <!--<string name="on_bicycle">On a bicycle</string>-->
+  <!--<string name="on_foot">On foot</string>-->
+  <!--<string name="running">Running</string>-->
+  <!--<string name="still">Still</string>-->
+  <!--<string name="tilting">Tilting</string>-->
+  <!--<string name="unknown">Unknown activity</string>-->
+  <!--<string name="walking">Walking</string>-->
+  <!--<string name="unidentifiable_activity">Unidentifiable activity: %1$d</string>-->
+
 </resources>

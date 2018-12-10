@@ -16,24 +16,39 @@
 package org.traccar.client;
 
 import android.annotation.SuppressLint;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.BatteryManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
-public class PositionProvider implements LocationListener {
+import com.google.android.gms.location.ActivityRecognitionClient;
+import com.google.android.gms.location.DetectedActivity;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+
+import java.util.ArrayList;
+
+public class PositionProvider implements LocationListener{
 
     private static final String TAG = PositionProvider.class.getSimpleName();
 
-    private static final int MINIMUM_INTERVAL = 1000;
+    static final long DETECTION_INTERVAL_IN_MILLISECONDS = 60 * 1000; // 30 seconds
 
     public interface PositionListener {
         void onPositionUpdate(Position position);
@@ -44,6 +59,17 @@ public class PositionProvider implements LocationListener {
     private final Context context;
     private SharedPreferences preferences;
     private LocationManager locationManager;
+    private ActivityRecognitionClient mActivityRecognitionClient;
+
+    public static boolean isIsMoving() {
+        return isMoving;
+    }
+
+    public static void setIsMoving(boolean isMoving) {
+        PositionProvider.isMoving = isMoving;
+    }
+
+    private static boolean isMoving = false;
 
     private String deviceId;
     private long interval;
@@ -57,11 +83,13 @@ public class PositionProvider implements LocationListener {
 
     private boolean isStarted = false;
 
-    public PositionProvider(Context context, PositionListener listener) {
+    public PositionProvider(Context context, PositionListener listener){
         this.context = context;
         this.listener = listener;
 
         locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+
+        mActivityRecognitionClient = new ActivityRecognitionClient(context);
 
         preferences = PreferenceManager.getDefaultSharedPreferences(context);
 
@@ -94,9 +122,81 @@ public class PositionProvider implements LocationListener {
                     0,
                     0.0f, this);
 			*/
+//            ActivityRecognitionClient
+//            sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+//            sensorManager.registerListener(this, accelerometer, MINIMUM_INTERVAL_ACCL_SENSOR_IN_SECOND * 1000000);
+            requestActivityUpdatesButtonHandler();
+
         } catch (RuntimeException e) {
             Toast.makeText(context, e.getMessage(), Toast.LENGTH_LONG).show();
         }
+    }
+
+    private PendingIntent getActivityDetectionPendingIntent() {
+        Intent intent = new Intent(context, DetectedActivitiesIntentService.class);
+
+        // We use FLAG_UPDATE_CURRENT so that we get the same pending intent back when calling
+        // requestActivityUpdates() and removeActivityUpdates().
+        return PendingIntent.getService(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+    }
+
+    public void requestActivityUpdatesButtonHandler() {
+        Task<Void> task = mActivityRecognitionClient.requestActivityUpdates(
+                DETECTION_INTERVAL_IN_MILLISECONDS,
+                getActivityDetectionPendingIntent());
+
+        task.addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void result) {
+//                Toast.makeText(context,
+//                        getString(R.string.activity_updates_enabled),
+//                        Toast.LENGTH_SHORT)
+//                        .show();
+//                setUpdatesRequestedState(true);
+//                updateDetectedActivitiesList();
+            }
+        });
+
+        task.addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+//                Log.w(TAG, getString(R.string.activity_updates_not_enabled));
+//                Toast.makeText(mContext,
+//                        getString(R.string.activity_updates_not_enabled),
+//                        Toast.LENGTH_SHORT)
+//                        .show();
+//                setUpdatesRequestedState(false);
+                StatusActivity.addMessage("Activity detect listener adding failed");
+            }
+        });
+    }
+
+    public void removeActivityUpdatesButtonHandler() {
+        Task<Void> task = mActivityRecognitionClient.removeActivityUpdates(
+                getActivityDetectionPendingIntent());
+        task.addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void result) {
+//                Toast.makeText(mContext,
+//                        getString(R.string.activity_updates_removed),
+//                        Toast.LENGTH_SHORT)
+//                        .show();
+//                setUpdatesRequestedState(false);
+//                // Reset the display.
+//                mAdapter.updateActivities(new ArrayList<DetectedActivity>());
+            }
+        });
+
+        task.addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+//                Log.w(TAG, "Failed to enable activity recognition.");
+//                Toast.makeText(mContext, getString(R.string.activity_updates_not_removed),
+//                        Toast.LENGTH_SHORT).show();
+//                setUpdatesRequestedState(true);
+                StatusActivity.addMessage("Activity detect listener removing failed");
+            }
+        });
     }
 
     public static String getProvider(String accuracy) {
@@ -108,6 +208,20 @@ public class PositionProvider implements LocationListener {
             default:
                 return LocationManager.NETWORK_PROVIDER;
         }
+    }
+
+    public boolean isMoving(){
+//        boolean result = true;/
+
+        //check whether device really moving.
+
+
+        if(isMoving){
+            return true;
+        }
+
+        StatusActivity.addMessage(context.getString(R.string.status_movement_not_detected));
+        return false;
     }
 
     @Override
@@ -124,9 +238,12 @@ public class PositionProvider implements LocationListener {
                             isForceFrequency
                             ||
                             (
-                                    distance > 0 ? diffDistance >= distance : true
-                                    ||
-                                    angle > 0 ? diffBearing >= angle : true
+                                    isMoving() && //보정하기 위해 넣는다.
+                                    (
+                                        distance > 0 ? diffDistance >= distance : true
+                                        ||
+                                        angle > 0 ? diffBearing >= angle : true
+                                    )
                             )
                         )
                 )
@@ -154,6 +271,8 @@ public class PositionProvider implements LocationListener {
     }
 
     synchronized public void stopUpdates() {
+        removeActivityUpdatesButtonHandler();
+
         locationManager.removeUpdates(this);
         isStarted = false;
     }
@@ -167,5 +286,4 @@ public class PositionProvider implements LocationListener {
         }
         return 0;
     }
-
 }
