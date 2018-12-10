@@ -211,7 +211,7 @@ public class PositionProvider implements LocationListener{
     }
 
     public boolean isMoving(){
-        if(isMoving){
+        if(PositionProvider.isMoving){
             return true;
         }
 

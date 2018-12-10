@@ -65,34 +65,37 @@ public class DetectedActivitiesIntentService extends IntentService {
         int maxType = -1;
 
         // Log each activity.
-        for (DetectedActivity da: detectedActivities) {
-            if(maxConfidence < da.getConfidence()) {
+        for (DetectedActivity da : detectedActivities) {
+            if (maxConfidence < da.getConfidence()) {
                 maxConfidence = da.getConfidence();
                 maxType = da.getType();
             }
         }
-
-        if(maxConfidence > 50){ //Detect when only over 50% confidence
-            switch(maxType) {
-                case DetectedActivity.IN_VEHICLE:
-                case DetectedActivity.ON_BICYCLE:
-                case DetectedActivity.ON_FOOT:
-                case DetectedActivity.RUNNING:
-                case DetectedActivity.WALKING:
-                    PositionProvider.setIsMoving(true);
-                    StatusActivity.addMessage(this.getString(R.string.status_activity_moving) + String.valueOf(maxConfidence));
-                    break;
-                case DetectedActivity.STILL:
-                case DetectedActivity.TILTING:
-                case DetectedActivity.UNKNOWN:
-                    PositionProvider.setIsMoving(false);
-                    StatusActivity.addMessage(this.getString(R.string.status_activity_staying) + String.valueOf(maxConfidence));
-                    break;
-                default:
-                    break;
+        try {
+            if (maxConfidence > 50) { //Detect when only over 50% confidence
+                switch (maxType) {
+                    case DetectedActivity.IN_VEHICLE:
+                    case DetectedActivity.ON_BICYCLE:
+                    case DetectedActivity.ON_FOOT:
+                    case DetectedActivity.RUNNING:
+                    case DetectedActivity.WALKING:
+                        PositionProvider.setIsMoving(true);
+                        StatusActivity.addMessage(this.getString(R.string.status_activity_moving) + String.valueOf(maxConfidence));
+                        break;
+                    case DetectedActivity.STILL:
+                    case DetectedActivity.TILTING:
+                    case DetectedActivity.UNKNOWN:
+                        PositionProvider.setIsMoving(false);
+                        StatusActivity.addMessage(this.getString(R.string.status_activity_staying) + String.valueOf(maxConfidence));
+                        break;
+                    default:
+                        break;
+                }
+            } else {
+                //Do nothing when no dominant type
             }
-        }else{
-            //Do nothing when no dominant type
+        }catch(Exception e){
+
         }
     }
 }
