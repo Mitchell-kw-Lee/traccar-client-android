@@ -211,11 +211,6 @@ public class PositionProvider implements LocationListener{
     }
 
     public boolean isMoving(){
-//        boolean result = true;/
-
-        //check whether device really moving.
-
-
         if(isMoving){
             return true;
         }
