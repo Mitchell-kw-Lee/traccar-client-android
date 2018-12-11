@@ -18,8 +18,6 @@ package org.traccar.client;
 
 import android.app.IntentService;
 import android.content.Intent;
-import android.preference.PreferenceManager;
-import android.util.Log;
 
 import com.google.android.gms.location.ActivityRecognitionResult;
 import com.google.android.gms.location.DetectedActivity;
@@ -34,7 +32,7 @@ import java.util.ArrayList;
 public class DetectedActivitiesIntentService extends IntentService {
 
     protected static final String TAG = "DetectedActivitiesIS";
-
+    private static int prevConfidence = 0;
     /**
      * This constructor is required, and calls the super IntentService(String)
      * constructor with the name for a worker thread.
@@ -73,20 +71,46 @@ public class DetectedActivitiesIntentService extends IntentService {
         }
         try {
             if (maxConfidence > 50) { //Detect when only over 50% confidence
+
                 switch (maxType) {
                     case DetectedActivity.IN_VEHICLE:
                     case DetectedActivity.ON_BICYCLE:
                     case DetectedActivity.ON_FOOT:
                     case DetectedActivity.RUNNING:
                     case DetectedActivity.WALKING:
-                        PositionProvider.setIsMoving(true);
-                        StatusActivity.addMessage(this.getString(R.string.status_activity_moving) + String.valueOf(maxConfidence));
+                        {
+                            boolean doUpdate = true;
+                            if (prevConfidence < 0) {
+                                //
+                                if(-30 < prevConfidence + maxConfidence) {
+                                    //too extream update
+                                    doUpdate = false;
+                                }
+                            }
+                            if(doUpdate) {
+                                PositionProvider.setIsMovingFlag(true);
+                                StatusActivity.addMessage(this.getString(R.string.status_activity_moving) + String.valueOf(maxConfidence));
+                                prevConfidence = maxConfidence;
+                            }
+                        }
                         break;
                     case DetectedActivity.STILL:
                     case DetectedActivity.TILTING:
                     case DetectedActivity.UNKNOWN:
-                        PositionProvider.setIsMoving(false);
-                        StatusActivity.addMessage(this.getString(R.string.status_activity_staying) + String.valueOf(maxConfidence));
+                        {
+                            boolean doUpdate = true;
+                            if (prevConfidence > 0) {
+                                if ((-maxConfidence) + prevConfidence < 30) {
+                                    //
+                                    doUpdate = false;
+                                }
+                            }
+                            if(doUpdate) {
+                                PositionProvider.setIsMovingFlag(false);
+                                StatusActivity.addMessage(this.getString(R.string.status_activity_staying) + String.valueOf(maxConfidence));
+                                prevConfidence = -maxConfidence;
+                            }
+                        }
                         break;
                     default:
                         break;

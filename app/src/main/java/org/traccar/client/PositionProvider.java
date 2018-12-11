@@ -21,10 +21,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -33,16 +29,12 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.util.Log;
-import android.view.View;
 import android.widget.Toast;
 
 import com.google.android.gms.location.ActivityRecognitionClient;
-import com.google.android.gms.location.DetectedActivity;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-
-import java.util.ArrayList;
 
 public class PositionProvider implements LocationListener{
 
@@ -61,15 +53,15 @@ public class PositionProvider implements LocationListener{
     private LocationManager locationManager;
     private ActivityRecognitionClient mActivityRecognitionClient;
 
-    public static boolean isIsMoving() {
-        return isMoving;
+    public static boolean isIsMovingFlag() {
+        return isMovingFlag;
     }
 
-    public static void setIsMoving(boolean isMoving) {
-        PositionProvider.isMoving = isMoving;
+    public static void setIsMovingFlag(boolean isMovingFlag) {
+        PositionProvider.isMovingFlag = isMovingFlag;
     }
 
-    private static boolean isMoving = false;
+    private static boolean isMovingFlag = false;
 
     private String deviceId;
     private long interval;
@@ -211,7 +203,7 @@ public class PositionProvider implements LocationListener{
     }
 
     public boolean isMoving(){
-        if(PositionProvider.isMoving){
+        if(PositionProvider.isMovingFlag){
             return true;
         }
 
@@ -224,6 +216,7 @@ public class PositionProvider implements LocationListener{
         double diffDistance = lastLocation != null ? location.distanceTo(lastLocation) : 0;
         double diffBearing = lastLocation != null ? Math.abs(location.getBearing() - lastLocation.getBearing()) : 0;
         if (location != null &&
+            isMoving() && //to Compensate
             (lastLocation == null
                 ||
                 (
@@ -233,12 +226,9 @@ public class PositionProvider implements LocationListener{
                             isForceFrequency
                             ||
                             (
-                                    isMoving() && //보정하기 위해 넣는다.
-                                    (
-                                        distance > 0 ? diffDistance >= distance : true
-                                        ||
-                                        angle > 0 ? diffBearing >= angle : true
-                                    )
+                                distance > 0 ? diffDistance >= distance : true
+                                ||
+                                angle > 0 ? diffBearing >= angle : true
                             )
                         )
                 )
