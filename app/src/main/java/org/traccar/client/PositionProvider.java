@@ -134,7 +134,7 @@ public class PositionProvider implements LocationListener{
 
     public void requestActivityUpdatesButtonHandler() {
         Task<Void> task = mActivityRecognitionClient.requestActivityUpdates(
-                DETECTION_INTERVAL_IN_MILLISECONDS,
+                (int) (((float)interval * 0.1f) * 3.0f), //DETECTION_INTERVAL_IN_MILLISECONDS,
                 getActivityDetectionPendingIntent());
 
         task.addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -241,6 +241,13 @@ public class PositionProvider implements LocationListener{
             Log.i(TAG, location != null ? "location ignored" : "location nil");
             StatusActivity.addMessage(context.getString(R.string.status_location_ignored));
         }
+
+        //reset
+        setIsMovingFlag(false);
+        StatusActivity.addMessage("reset move flag");
+
+        removeActivityUpdatesButtonHandler();
+        requestActivityUpdatesButtonHandler();
     }
 
     @Override

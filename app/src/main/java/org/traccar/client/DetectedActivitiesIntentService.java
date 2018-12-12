@@ -80,13 +80,13 @@ public class DetectedActivitiesIntentService extends IntentService {
                     case DetectedActivity.WALKING:
                         {
                             boolean doUpdate = true;
-                            if (prevConfidence < 0) {
-                                //
-                                if(-30 < prevConfidence + maxConfidence) {
-                                    //too extream update
-                                    doUpdate = false;
-                                }
-                            }
+//                            if (prevConfidence < 0) {
+//                                //
+//                                if(-30 < prevConfidence + maxConfidence) {
+//                                    //too extream update
+//                                    doUpdate = false;
+//                                }
+//                            }
                             if(doUpdate) {
                                 PositionProvider.setIsMovingFlag(true);
                                 StatusActivity.addMessage(this.getString(R.string.status_activity_moving) + String.valueOf(maxConfidence));
@@ -99,17 +99,17 @@ public class DetectedActivitiesIntentService extends IntentService {
                     case DetectedActivity.UNKNOWN:
                         {
                             boolean doUpdate = true;
-                            if (prevConfidence > 0) {
-                                if ((-maxConfidence) + prevConfidence < 30) {
-                                    //
-                                    doUpdate = false;
-                                }
-                            }
-                            if(doUpdate) {
-                                PositionProvider.setIsMovingFlag(false);
-                                StatusActivity.addMessage(this.getString(R.string.status_activity_staying) + String.valueOf(maxConfidence));
-                                prevConfidence = -maxConfidence;
-                            }
+//                            if (prevConfidence > 0) {
+//                                if ((-maxConfidence) + prevConfidence < 30) {
+//                                    //
+//                                    doUpdate = false;
+//                                }
+//                            }
+//                            if(doUpdate) {
+//                                PositionProvider.setIsMovingFlag(false);
+                                StatusActivity.addMessage("(" + this.getString(R.string.status_activity_staying) + String.valueOf(maxConfidence) + ")");
+//                                prevConfidence = -maxConfidence;
+//                            }
                         }
                         break;
                     default:
