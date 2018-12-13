@@ -207,7 +207,7 @@ public class PositionProvider implements LocationListener{
             return true;
         }
 
-        StatusActivity.addMessage(context.getString(R.string.status_movement_not_detected));
+//        StatusActivity.addMessage(context.getString(R.string.status_movement_not_detected));
         return false;
     }
 
@@ -244,7 +244,6 @@ public class PositionProvider implements LocationListener{
 
         //reset
         setIsMovingFlag(false);
-        StatusActivity.addMessage("reset move flag");
 
         removeActivityUpdatesButtonHandler();
         requestActivityUpdatesButtonHandler();

@@ -26,7 +26,7 @@ import java.net.URL;
 
 public class RequestManager {
 
-    private static final int TIMEOUT = 15 * 1000;
+    private static final int TIMEOUT = 25 * 1000;
 
     public interface RequestHandler {
         void onComplete(boolean success);

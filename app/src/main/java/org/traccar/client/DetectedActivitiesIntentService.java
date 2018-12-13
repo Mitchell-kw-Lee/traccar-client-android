@@ -33,6 +33,8 @@ public class DetectedActivitiesIntentService extends IntentService {
 
     protected static final String TAG = "DetectedActivitiesIS";
     private static int prevConfidence = 0;
+    private static int prevType = 0;
+
     /**
      * This constructor is required, and calls the super IntentService(String)
      * constructor with the name for a worker thread.
@@ -78,45 +80,27 @@ public class DetectedActivitiesIntentService extends IntentService {
                     case DetectedActivity.ON_FOOT:
                     case DetectedActivity.RUNNING:
                     case DetectedActivity.WALKING:
-                        {
-                            boolean doUpdate = true;
-//                            if (prevConfidence < 0) {
-//                                //
-//                                if(-30 < prevConfidence + maxConfidence) {
-//                                    //too extream update
-//                                    doUpdate = false;
-//                                }
-//                            }
-                            if(doUpdate) {
-                                PositionProvider.setIsMovingFlag(true);
-                                StatusActivity.addMessage(this.getString(R.string.status_activity_moving) + String.valueOf(maxConfidence));
-                                prevConfidence = maxConfidence;
-                            }
+                        PositionProvider.setIsMovingFlag(true);
+                        if(prevType != 1) {
+                            StatusActivity.addMessage(this.getString(R.string.status_activity_moving) + String.valueOf(maxConfidence));
                         }
+                        prevType = 1;
                         break;
                     case DetectedActivity.STILL:
                     case DetectedActivity.TILTING:
                     case DetectedActivity.UNKNOWN:
-                        {
-                            boolean doUpdate = true;
-//                            if (prevConfidence > 0) {
-//                                if ((-maxConfidence) + prevConfidence < 30) {
-//                                    //
-//                                    doUpdate = false;
-//                                }
-//                            }
-//                            if(doUpdate) {
-//                                PositionProvider.setIsMovingFlag(false);
-                                StatusActivity.addMessage("(" + this.getString(R.string.status_activity_staying) + String.valueOf(maxConfidence) + ")");
-//                                prevConfidence = -maxConfidence;
-//                            }
+                        if(prevType != -1) {
+                            StatusActivity.addMessage("(" + this.getString(R.string.status_activity_staying) + String.valueOf(maxConfidence) + ")");
                         }
+                        prevType = -1;
                         break;
                     default:
                         break;
                 }
+                prevConfidence = maxConfidence;
             } else {
                 //Do nothing when no dominant type
+                StatusActivity.addMessage("(maxType:" + String.valueOf(maxType) + ", low confidence:" + String.valueOf(maxConfidence) + ")");
             }
         }catch(Exception e){
 
